@@ -6,9 +6,9 @@ require 'twitter_ebooks'  # https://github.com/mispy/twitter_ebooks
 require_relative 'poem'
 
 AUTH_FILENAME = 'auth.twitter.json'
-TWEET_CHANCE = 0...7
-MIN_PASSED_TWEETS = 3
-MAX_PASSED_TWEETS = 15
+TWEET_CHANCE = 0...8
+MIN_PASSED_TWEETS = 4
+MAX_PASSED_TWEETS = 17
 
 module PoemExe
   class Bot

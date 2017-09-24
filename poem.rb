@@ -1,19 +1,32 @@
 #!/usr/bin/env ruby
-#------------------------------------------------------------------------------
-# poem.exe
-# --------
-# author:   Liam Cooke
-# live:     2014-06-21 01:47 +01:00
-# twitter:  twitter.com/poem_exe
-# tumblr:   poemexe.tumblr.com
-# license:  MIT License
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+#
+# .-----.-----.-----.--------.  .-----.--.--.-----.
+# |  _  |  _  |  -__|        |__|  -__|_   _|  -__|
+# |   __|_____|_____|__|__|__|__|_____|__.__|_____|
+# |__|
+#
+# MIT License
+# Copyright (c) 2014-2017 Liam Cooke
+#
+# Poems published on social media are licensed under the Creative Commons
+# BY-NC-ND 4.0 license. Copyright (c) 2014-2017 Liam Cooke.
+#
+# https://poemexe.com
+# https://github.com/ljcooke/poemexe
+# https://twitter.com/poem_exe
+# https://poemexe.tumblr.com
+# https://botsin.space/@poem_exe
+# https://oulipo.social/@quasihaiku
+#
+# -----------------------------------------------------------------------------
 
+require 'date'
 require 'json'
 require 'optparse'
 
 
-#
+# -----------------------------------------------------------------------------
 # poem.exe generates poems using an approach based on Leonard Richardson's
 # Queneau Assembly technique. Each verse in the corpus is divided into three
 # "buckets", consisting of one opening line, zero or more middle lines, and one
@@ -29,7 +42,7 @@ require 'optparse'
 #   4. From the third poem, randomly select a middle line (2), if any.
 #   5. From the fourth poem, select the closing line (3).
 #   6. Put them all together, giving a poem 2-4 lines long.
-#
+# -----------------------------------------------------------------------------
 
 HAIKU_FORM = { :pattern => [1, 2, 3], :keep_pauses => true }
 
@@ -39,7 +52,7 @@ ALT_FORMS = [
   { :pattern => [1, 2, 2, 3] },
 ]
 
-#
+# -----------------------------------------------------------------------------
 # Poems may be accepted or rejected if they contain any seasonal reference
 # keywords. These are mostly based on the Japanese kigo (words or phrases
 # associated with particular seasons in Japan).
@@ -55,7 +68,7 @@ ALT_FORMS = [
 # For example, "winter" is a STRONG reference. A poem containing the word
 # "winter" would be rejected in autumn-spring; in summer-winter it would be
 # accepted unless the poem also contained a STRONG reference to autumn-spring.
-#
+# -----------------------------------------------------------------------------
 
 SEASON_STRONG_MATCH = [
   /summer|winte?r|solsti[ct]/,
@@ -63,18 +76,18 @@ SEASON_STRONG_MATCH = [
 ]
 
 MONTH_STRONG_MATCH = [
-  nil,
-  /\b(valentine)/,
-  /\b(shamrock)/,
-  nil,
-  nil,
-  nil,
-  nil,
-  nil,
-  nil,
-  /\b(hallowe.?en|thanksgiving|trick.or.treat)/,
-  nil,
-  /\b(christmas|end.of.(the.)?year|presents|santa|sleigh)/,
+  /\b(january)/,
+  /\b(february|valentine)/,
+  /\b(in\smarch|shamrock)/,
+  /\b(april)/,
+  /\b(in\smay)/,
+  /\b(june)/,
+  /\b(july)/,
+  /\b(august)/,
+  /\b(september)/,
+  /\b(october|hallowe.?en|trick.or.treat)/,
+  /\b(november)/,
+  /\b(december|christmas|end.of.(the.)?year|presents|santa|sleigh)/,
 ]
 
 SEASON_WEAK_MATCH = [
@@ -106,28 +119,27 @@ SEASON_WEAK_MATCH = [
 ]
 
 MONTH_WEAK_MATCH = [
-  /\b(january|first)/,
-  /\b(february|cupid|heart|love)/,
-  /\b(march|equino[xc])/,
-  /\b(april)/,
-  /\b(may)/,
-  /\b(june|solsti[ct])/,
-  /\b(july)/,
-  /\b(august)/,
-  /\b(september|equino[xc])/,
-  /\b(october|
-      afraid|bone|cemetery|cobweb|fog|fright|ghost|grave|grim|hallowe|haunt|headstone|
+  /\b(first)/,
+  /\b(cupid|heart|love)/,
+  /\b(equino[xc])/,
+  nil,
+  nil,
+  /\b(solsti[ct])/,
+  nil,
+  nil,
+  /\b(equino[xc])/,
+  /\b(afraid|bone|cemetery|cobweb|fog|fright|ghost|grave|grim|hallowe|haunt|headstone|
       pumpkin|scare|scream|skelet|skull|spider|spine|spook|tomb|witch|wizard)/x,
-  /\b(november|thanksgiving)/,
-  /\b(december|bells|carol|festive|gift|jingl|joll|joy|merry|solsti[ct]|tree|twinkl)/,
+  nil,
+  /\b(bells|carol|festive|gift|jingl|joll|joy|merry|solsti[ct]|tree|twinkl)/,
 ]
 
-#
+# -----------------------------------------------------------------------------
 # With the bulk of the corpus consisting of haiku by Kobayashi Issa, poem.exe
 # quickly developed its own particular fondness for snails (an early classic:
 # "snail / between my hands / snail"). Here we give the word a little extra
 # weight, for the fans.
-#
+# -----------------------------------------------------------------------------
 
 ALWAYS_IN_SEASON = /snail/
 
@@ -176,20 +188,53 @@ module PoemExe
   end
 
   class Poet
-    def initialize(model_name)
+    def initialize(model_name, options={})
       @model_name = model_name
       @mtime = {}
       @queneau = nil
+      @vocab = nil
+      @excludes = []
+
       load_model :force => true
+
+      @oulipo = options[:oulipo] || false
     end
 
     def load_model(opts={})
+      updated = false
+
       corpus_filename = "corpus/#{@model_name}.json"
       mtime = File.mtime(corpus_filename)
       if opts[:force] or mtime != @mtime[:corpus]
         @queneau = PoemExe::Queneau.new corpus_filename
         @mtime[:corpus] = mtime
+        updated = true
       end
+
+      vocab_filename = "corpus/vocab.json"
+      mtime = File.mtime(vocab_filename)
+      if opts[:force] or mtime != @mtime[:vocab]
+        @vocab = JSON.parse(File.read(vocab_filename), symbolize_names: true)
+        @mtime[:vocab] = mtime
+        updated = true
+      end
+
+      path = 'excludes.txt'
+      mtime = File.mtime(path)
+      if opts[:force] or mtime != @mtime[:excludes]
+        @excludes = File.open(path).map { |line|
+          pattern = line.split('#', 2).first.strip
+          Regexp.new(pattern, Regexp::IGNORECASE) unless pattern.empty?
+        }.compact
+        @mtime[:excludes] = mtime
+        updated = true
+      end
+
+      updated
+    end
+
+    def excluded?(poem)
+      @excludes.any? { |pattern| pattern.match(poem) }
     end
 
     def timely?(poem, month)
@@ -199,6 +244,9 @@ module PoemExe
       # check some tricky STRONG references
       if /\b(new.?year|first.day.*year)/.match(text)
         return false unless [1, 12].include? month
+        strong = true
+      elsif /\b(thanksgiving|giv.*thanks)/.match(text)
+        return false unless [10, 11].include? month
         strong = true
       end
 
@@ -223,19 +271,40 @@ module PoemExe
       return true if strong
 
       # check for WEAK month references
-      return true if MONTH_WEAK_MATCH[month - 1].match(text)
+      pattern = MONTH_WEAK_MATCH[month - 1]
+      return true if !pattern.nil? && pattern.match(text)
 
       # check for WEAK seasonal references
-      return true if SEASON_WEAK_MATCH[season].match(text)
+      pattern = SEASON_WEAK_MATCH[season]
+      return true if !pattern.nil? && pattern.match(text)
 
       # no references at all; small chance to keep it
       rand(6) == 0
     end
 
+    def substitute_vocab(poem)
+      return poem unless poem.include? '%'
+
+      # Match strings of the form %key.index%, e.g. %noun.1%
+      pattern = /%(?<key>[^.%]+)(\.(?<index>[0-9]+))?%/
+
+      updated = poem.gsub(pattern) do
+        match = Regexp.last_match
+        key = match[:key].to_sym
+        index = [match[:index].to_i - 1, 0].max
+        vocab = @vocab[key].sample()[index]
+        return nil unless vocab
+        vocab
+      end
+
+      return nil if updated.include? '%'
+      updated
+    end
+
     def make_poem(opts={})
       month = opts[:month] || Time.now.month
       poem = ''
-      100.times do |i|
+      1000.times do |i|
 
         lines = []
         10.times do
@@ -258,36 +327,55 @@ module PoemExe
             end
           end
 
+          lines.map! { |line| line.strip }
           poem = PoemExe.format_poem(lines.join("\n"), opts)
+          poem = substitute_vocab(poem) #rescue nil
+          next if poem.nil?
+          next if @oulipo and poem.match /e/i
+          next if excluded? poem
           return poem if timely?(poem, month)
         end
 
       end
-      return poem
+      return nil
     end
   end
 end
 
-
-#
+# -----------------------------------------------------------------------------
 # Command-line usage example:
 #
 #     ./poem.rb -n3
 #         Generate three poems.
-#
+# -----------------------------------------------------------------------------
 
-if __FILE__ == $0
+def main
   num_poems = 1
+  month = nil
+  options = {}
 
   parser = OptionParser.new do |opts|
     opts.banner = "Usage: poem.rb [-n NUM]"
+    opts.on('-m=MONTH', 'override the current month') do |m|
+      m = m.to_i
+      month = m if m >= 1 && m <= 12
+    end
     opts.on('-n=NUM', 'number of poems to generate') do |n|
       num_poems = [n.to_i, 1].max
+    end
+    opts.on('-O', '--oulipo', 'ignore the letter e') do
+      options[:oulipo] = true
     end
   end
   parser.parse!
 
-  poem_exe = PoemExe::Poet.new 'haiku'
-  poems = num_poems.times.map { poem_exe.make_poem }
+  puts "== #{Date::MONTHNAMES[month]} ==\n" unless month.nil?
+
+  poem_exe = PoemExe::Poet.new 'haiku', options
+  poems = num_poems.times.map do
+    poem_exe.make_poem(:month => month)
+  end
   puts poems.join "\n\n"
 end
+
+main if $PROGRAM_NAME == __FILE__

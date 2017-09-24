@@ -1,13 +1,15 @@
 require 'date'
 require_relative 'poem'
 
-p = PoemExe::Poet.new 'haiku'
+options = {}
+options[:oulipo] = true if ARGV.include? '--oulipo'
+
+p = PoemExe::Poet.new('haiku', options)
 
 (1..12).each do |month|
-  puts Date::MONTHNAMES[month]
   1.times do
     poem = p.make_poem(single_line: true, month: month)
-    puts "    #{poem}"
+    prefix = sprintf('%02d', month)
+    puts "#{prefix}  #{poem}"
   end
-  #puts ""
 end

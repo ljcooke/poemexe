@@ -1,6 +1,4 @@
-#------------------------------------------------------------------------
 # Matsuo Bashō
-#------------------------------------------------------------------------
 
 old pond ...
 a frog leaps in
@@ -8,16 +6,14 @@ water’s sound
 
 spider, say again!
 it’s so hard to hear your voice
-in the autumn wind.
+in the {autumn,%season%} wind.
 
 soon they have to die,
 but there is no sign of it
 in cicadas’ cries.
 
 
-#------------------------------------------------------------------------
 # Kobayashi Issa
-#------------------------------------------------------------------------
 
 while i'm gone
 you and the nightingale are in charge
@@ -29,4 +25,4 @@ she liked to pick.
 
 o owl!
 make some other face.
-this is spring rain.
+this is {spring,%season%} rain.
