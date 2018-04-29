@@ -7,10 +7,10 @@
 # |__|
 #
 # MIT License
-# Copyright (c) 2014-2017 Liam Cooke
+# Copyright (c) 2014-2018 Liam Cooke
 #
-# Poems published on social media are licensed under the Creative Commons
-# BY-NC-ND 4.0 license. Copyright (c) 2014-2017 Liam Cooke.
+# Poems published on social media are licensed under the
+# Creative Commons Attribution 4.0 license.
 #
 # https://poemexe.com
 # https://github.com/ljcooke/poemexe
