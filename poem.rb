@@ -198,6 +198,7 @@ module PoemExe
       load_model :force => true
 
       @oulipo = options[:oulipo] || false
+      @max_length = (options[:max_length] || 0).to_i
     end
 
     def load_model(opts={})
@@ -331,6 +332,7 @@ module PoemExe
           poem = PoemExe.format_poem(lines.join("\n"), opts)
           poem = substitute_vocab(poem) #rescue nil
           next if poem.nil?
+          next if @max_length > 0 && poem.length > @max_length
           next if @oulipo and poem.match /e/i
           next if excluded? poem
           return poem if timely?(poem, month)
@@ -366,6 +368,12 @@ def main
     opts.on('-O', '--oulipo', 'ignore the letter e') do
       options[:oulipo] = true
     end
+    opts.on('-L=CHARS', '--max-length=CHARS', 'maximum length') do |n|
+      options[:max_length] = n.to_i
+    end
+    opts.on('-1', '--single-line', 'format the poem on one line') do
+      options[:single_line] = true
+    end
   end
   parser.parse!
 
@@ -373,7 +381,7 @@ def main
 
   poem_exe = PoemExe::Poet.new 'haiku', options
   poems = num_poems.times.map do
-    poem_exe.make_poem(:month => month)
+    poem_exe.make_poem(:month => month, :single_line => options[:single_line])
   end
   puts poems.join "\n\n"
 end
