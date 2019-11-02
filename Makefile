@@ -1,7 +1,12 @@
-.PHONY: corpus
+.PHONY: corpus test clean
 
 corpus:
-	mkdir -p corpus
-	python convert_haiku.py sources/
-	python convert_wordlists.py
-	ruby test_corpus.rb
+	(cd corpus && make)
+	bundle exec scripts/test-model
+
+test:
+	bundle exec ruby lib/poem_exe.rb
+
+clean:
+	rm -f model/*
+	rmdir model

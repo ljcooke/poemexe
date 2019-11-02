@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+require 'date'
+require_relative '../lib/poem_exe'
+
+options = {}
+options[:oulipo] = true if ARGV.include? '--oulipo'
+
+poem_exe = PoemExe::Poet.new(options)
+
+(1..12).each do |month|
+  1.times do
+    poem = poem_exe.generate(single_line: true, month: month, details: true)
+
+    text = poem[:text]
+    score = poem[:score]
+    prefix = sprintf('%02d', month)
+
+    puts "#{prefix}  #{text} [#{score}]"
+  end
+end

@@ -1,0 +1,93 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Mastodon API:
+#   https://github.com/tootsuite/mastodon-api
+#   http://tinysubversions.com/notes/mastodon-bot/
+
+require 'mastodon'
+require 'yaml'
+require_relative '../lib/poem_exe'
+
+CONFIG = {
+  :botsinspace => {
+    :server => 'https://botsin.space',
+  },
+  :oulipo => {
+    :server => 'https://oulipo.social',
+  },
+}
+
+# Path to a YAML file containing auth keys. This file should be in the format:
+#
+# mastodon:
+#   botsinspace:
+#     access_token: ...
+#   ...
+#
+AUTH_FILE = 'auth.yml'
+
+MAX_LENGTH = 500
+PUBLIC_CHANCE = 0...5
+
+module PoemExe
+  class MastodonBot
+    def initialize(key)
+      options = {}
+      options[:oulipo] = true if key == :oulipo
+
+      config = CONFIG[key]
+      auth = YAML.safe_load(File.read(AUTH_FILE))['mastodon'][key.to_s]
+
+      @client = Mastodon::REST::Client.new(base_url: config[:server],
+                                           bearer_token: auth['access_token'])
+      @poet = PoemExe::Poet.new(options)
+    end
+
+    def post
+      text = poet.generate
+      return if text.nil? || text.empty? || text.length > MAX_LENGTH
+
+      visibility = rand(PUBLIC_CHANCE) == 0 ? 'public' : 'unlisted'
+
+      puts text
+      puts "// visibility: #{visibility}"
+
+      create_status(text, visibility: visibility)
+    end
+
+    private
+
+    attr_reader :poet, :client
+
+    def create_status(text, visibility:)
+      headers = { 'Idempotency-Key' => "#{Time.now} #{text.hash}" }
+      3.times do |i|
+        sleep 5 if i > 0
+        begin
+          return client.create_status(text, visibility: visibility,
+                                            headers: headers)
+        rescue HTTP::TimeoutError
+          puts "HTTP timeout"
+        end
+      end
+    end
+  end
+end
+
+ARGV << '-h' if ARGV.empty?
+
+key = nil
+parser = OptionParser.new do |opts|
+  opts.banner = "Usage: bundle exec scripts/post-mastodon -k KEY"
+  opts.on('-k=KEY') do |k|
+    key = k.to_sym
+  end
+end
+parser.parse!
+
+if CONFIG.include? key
+  PoemExe::MastodonBot.new(key).post
+else
+  raise "Invalid key: #{key}"
+end

@@ -1,0 +1,51 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'twitter'
+require 'yaml'
+require_relative '../lib/poem_exe'
+
+# Path to a YAML file containing auth keys. This file should be in the format:
+#
+# twitter:
+#   default:
+#     consumer_key: ...
+#     consumer_secret: ...
+#     token: ...
+#     token_secret: ...
+#
+AUTH_FILE = 'auth.yml'
+
+MAX_LENGTH = 280
+
+module PoemExe
+  class TwitterBot
+    def initialize(key = 'default')
+      auth = YAML.safe_load(File.read(AUTH_FILE))['twitter'][key]
+
+      @client = Twitter::REST::Client.new do |config|
+        config.consumer_key        = auth['consumer_key']
+        config.consumer_secret     = auth['consumer_secret']
+        config.access_token        = auth['token']
+        config.access_token_secret = auth['token_secret']
+      end
+
+      @poet = PoemExe::Poet.new
+    end
+
+    def post
+      text = poet.generate
+      return if text.nil? || text.empty? || text.length > MAX_LENGTH
+
+      puts text
+
+      client.update(text)
+    end
+
+    private
+
+    attr_reader :poet, :client
+  end
+end
+
+PoemExe::TwitterBot.new.post

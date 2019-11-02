@@ -1,1 +1,3 @@
-corpus
+auth.*
+model.json
+*.log

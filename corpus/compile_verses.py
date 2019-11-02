@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 import argparse
 import codecs
 import json
@@ -8,7 +8,7 @@ import sys
 from glob import glob
 
 
-OUTPUT_FILENAME = 'corpus/haiku.json'
+OUTPUT_FILENAME = '../model/verses.json'
 
 RE_CONTAINS_URL = re.compile('https?://')
 RE_WEAK_LINE = re.compile(' (and|by|from|is|of|that|the|with)\\n',
@@ -41,7 +41,7 @@ def parse_credit(line):
     return line[2:].lstrip() if line.startswith('//') else None
 
 
-def convert_dirs(dirs):
+def convert_dirs(dirs, export=False):
     for dirname in dirs:
         for fn in glob(os.path.join(dirname, '*.txt')):
             print('Reading {}'.format(fn))
@@ -102,14 +102,17 @@ def convert_dirs(dirs):
                     output_haiku.append(obj)
                     output_texts.append(' / '.join(output_lines))
 
-    print('Writing {}'.format(OUTPUT_FILENAME))
-    with codecs.open(OUTPUT_FILENAME, 'w', encoding='utf-8') as fp:
-        json.dump(sorted(output_haiku), fp,
-                  indent=2, sort_keys=True, ensure_ascii=False)
+    if export:
+        print('Writing {}'.format(OUTPUT_FILENAME))
+        with codecs.open(OUTPUT_FILENAME, 'w', encoding='utf-8') as fp:
+            json.dump(output_haiku, fp,
+                      indent=2, sort_keys=True, ensure_ascii=False)
 
-    maxlen = max(len(text) for text in output_texts)
-    print('Wrote {} poems with maximum length {}'
-          .format(len(output_haiku), maxlen))
+        maxlen = max(len(text) for text in output_texts)
+        print('Wrote {} poems with maximum length {}'
+              .format(len(output_haiku), maxlen))
+
+    return output_haiku
 
 
 def main():
@@ -121,7 +124,7 @@ def main():
         parser.print_help()
         return 1
 
-    convert_dirs(args.srcdir)
+    convert_dirs(args.srcdir, export=True)
 
 if __name__ == '__main__':
     sys.exit(main())

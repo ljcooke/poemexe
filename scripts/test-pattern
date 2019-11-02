@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+require 'date'
+require_relative '../lib/poem_exe'
+
+re = Regexp.new(ARGV.join(' ').strip)
+
+poem_exe = PoemExe::Poet.new
+
+matches = 0
+tries = 0
+
+while matches < 10 and tries < 12000
+  poem = poem_exe.generate(single_line: true, month: tries % 12 + 1)
+  if re.match? poem
+    puts poem
+    matches += 1
+  end
+  tries += 1
+end
+
+unless matches > 0
+  puts "No matches"
+end
