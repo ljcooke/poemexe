@@ -1,8 +1,22 @@
 poem.exe
 ========
 
-**poem.exe** is a project that generates tiny haiku-like poems for
-@[poem_exe][poem_exe].
+**poem.exe** is a project that generates tiny haiku-like poems and posts them
+on social media.
+
+- [@poem_exe](https://twitter.com/poem_exe) on Twitter (the original);
+
+- [@poem_exe](https://botsin.space/@poem_exe) on Mastodon;
+
+- [@quasihaiku](https://oulipo.social/@quasihaiku) on Mastodon (posts without
+  using the letter _e_).
+
+More info:
+
+- <https://liamcooke.com/code/poem-exe/>
+- <https://poemexe.com/>
+
+## Code
 
 The `corpus` directory contains text files with poems and word lists, and
 Python scripts which compile these files into a `model.json` file.
