@@ -17,7 +17,7 @@ require 'optparse'
 # Copyright (c) 2014-2018 Liam Cooke
 #
 # https://poemexe.com
-# https://github.com/ljcooke/poemexe
+# https://git.sr.ht/~ljc/poemexe
 #
 # -----------------------------------------------------------------------------
 #
