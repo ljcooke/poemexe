@@ -1,3 +1,7 @@
+This project has moved to Sourcehut: <https://git.sr.ht/~ljc/poemexe>
+
+---
+
 poem.exe
 ========
 
