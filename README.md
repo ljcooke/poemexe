@@ -14,7 +14,6 @@ on social media.
 More info:
 
 - <https://liamcooke.com/code/poem-exe/>
-- <https://poemexe.com/>
 
 ## Code
 
