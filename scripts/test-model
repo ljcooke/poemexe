@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
 require 'date'
 require_relative '../lib/poem_exe'
 
@@ -9,7 +11,7 @@ poem_exe = PoemExe::Poet.new(options)
 
 (1..12).each do |month|
   1.times do
-    prefix = sprintf('%02d', month)
+    prefix = format('%02d', month)
     poem = poem_exe.generate(single_line: true, month:, details: true)
 
     if poem

@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
 require 'date'
 require_relative '../lib/poem_exe'
 
@@ -9,7 +11,7 @@ poem_exe = PoemExe::Poet.new
 matches = 0
 tries = 0
 
-while matches < 10 and tries < 12000
+while (matches < 10) && (tries < 12_000)
   poem = poem_exe.generate(single_line: true, month: tries % 12 + 1)
   if re.match? poem
     puts poem
@@ -18,6 +20,4 @@ while matches < 10 and tries < 12000
   tries += 1
 end
 
-unless matches > 0
-  puts "No matches"
-end
+puts 'No matches' unless matches.positive?

@@ -29,7 +29,7 @@ module PoemExe
           end
 
           opts.on('-n=NUM', 'number of poems to generate') do |n|
-            config[:num_poems] = [1, n.to_i].max
+            config[:num_poems] = [ 1, n.to_i ].max
           end
 
           opts.on('-O', '--oulipo', 'ignore the letter e') do

@@ -54,10 +54,10 @@ module PoemExe
     def generate(log: true, max_retries: 3)
       last_error = nil
       [ max_retries, 1 ].max.times do
-        $stderr.puts last_error if last_error
+        warn last_error if last_error
         text = poet.generate
         if text.nil? || text.empty?
-          last_error = "No poem generated"
+          last_error = 'No poem generated'
         elsif text.size > MAX_LENGTH
           last_error = "Poem exceeded max length (#{text.size} chars)"
         else
@@ -76,16 +76,16 @@ module PoemExe
       text = nil
       action = :generate
 
-      while action do
+      while action
         text = generate(log: true) if action == :generate
-        puts "=> Post? (y)es, (n)o, (r)eroll"
+        puts '=> Post? (y)es, (n)o, (r)eroll'
 
         case gets.chomp
-        when "y" then
+        when 'y'
           create_status(text)
           action = nil
-        when "n", "q" then action = nil
-        when "r" then action = :generate
+        when 'n', 'q' then action = nil
+        when 'r' then action = :generate
         else action = :prompt
         end
       end
@@ -95,22 +95,22 @@ module PoemExe
 
     attr_reader :poet, :client
 
-    def create_status(text, visibility: "unlisted")
+    def create_status(text, visibility: 'unlisted')
       headers = {
-        'Idempotency-Key' => Digest::SHA256.hexdigest("#{Time.now} #{text}")
+        'Idempotency-Key' => Digest::SHA256.hexdigest("#{Time.now} #{text}"),
       }
       3.times do |i|
         sleep 2**i if i.positive?
         begin
-          return client.create_status(text, visibility: visibility, headers: headers, quote_approval_policy: "public")
+          return client.create_status(text, visibility: visibility, headers: headers, quote_approval_policy: 'public')
         rescue HTTP::TimeoutError
-          $stderr.puts 'HTTP timeout'
+          warn 'HTTP timeout'
         rescue FrozenError => e
           # mastodon gem hasn't been updated in a few years.
           # This error has been happening after successfully posting, so let it go...
-          $stderr.puts e
-          $stderr.puts "Assuming post was successful"
-          return
+          warn e
+          warn 'Assuming post was successful'
+          return nil
         end
       end
     end

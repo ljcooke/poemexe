@@ -17,7 +17,7 @@ module PoemExe
       @exclude_patterns = model[:excludes].map do |rule|
         Regexp.new(rule, Regexp::IGNORECASE)
       end
-      @tone_feature = has_words?(:tone_dark) && has_words?(:tone_bright)
+      @tone_feature = wordlist?(:tone_dark) && wordlist?(:tone_bright)
     end
 
     def generate_lines
@@ -34,12 +34,14 @@ module PoemExe
 
     def dark_tone?(text)
       return false unless tone_feature?
+
       @dark_pattern ||= keyword_pattern(wordlists[:tone_dark])
       @dark_pattern.match?(text)
     end
 
     def bright_tone?(text)
       return false unless tone_feature?
+
       @bright_pattern ||= keyword_pattern(wordlists[:tone_bright])
       @bright_pattern.match?(text)
     end
@@ -48,7 +50,7 @@ module PoemExe
 
     attr_reader :exclude_patterns, :queneau
 
-    def has_words?(key)
+    def wordlist?(key)
       wordlist = wordlists[key]
       !wordlist.nil? && !wordlist.empty?
     end

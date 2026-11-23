@@ -86,9 +86,9 @@ module PoemExe
       return lines unless lines.size > 2 && rand <= chance
 
       if lines.size == 3 && rand <= 0.5
-        lines[0..1] + [lines.first, lines.last]
+        lines[0..1] + [ lines.first, lines.last ]
       else
-        lines + [lines.first]
+        lines + [ lines.first ]
       end
     end
 
@@ -100,7 +100,6 @@ module PoemExe
       text if valid_text?(text)
     end
 
-    # rubocop:disable Metrics/MethodLength
     def substitute_vocab(text)
       return text unless text.include?('%')
 
@@ -110,7 +109,7 @@ module PoemExe
       updated = text.gsub(pattern) do
         match = Regexp.last_match
         key = match[:key].to_sym
-        index = [match[:index].to_i - 1, 0].max
+        index = [ match[:index].to_i - 1, 0 ].max
         substitution = model.wordlists[key].sample[index]
         return nil unless substitution
 
@@ -119,7 +118,6 @@ module PoemExe
 
       updated.include?('%') ? nil : updated
     end
-    # rubocop:enable Metrics/MethodLength
 
     def valid_text?(text)
       return false if text.nil? || text.empty? || too_long?(text)
