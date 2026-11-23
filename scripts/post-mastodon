@@ -5,18 +5,21 @@
 #   https://github.com/tootsuite/mastodon-api
 #   http://tinysubversions.com/notes/mastodon-bot/
 
+require 'digest'
 require 'mastodon'
+require 'optparse'
 require 'yaml'
 require_relative '../lib/poem_exe'
 
 CONFIG = {
-  :botsinspace => {
-    :server => 'https://botsin.space',
+  # RIP
+  # botsinspace: {
+  #   server: 'https://botsin.space',
+  # },
+  oulipo: {
+    server: 'https://oulipo.social',
   },
-  :oulipo => {
-    :server => 'https://oulipo.social',
-  },
-}
+}.freeze
 
 # Path to a YAML file containing auth keys. This file should be in the format:
 #
@@ -28,10 +31,12 @@ CONFIG = {
 AUTH_FILE = 'auth.yml'
 
 MAX_LENGTH = 500
-PUBLIC_CHANCE = 0...5
+# PUBLIC_CHANCE = (0...100).freeze
 
 module PoemExe
   class MastodonBot
+    class PoemError < StandardError; end
+
     def initialize(key)
       options = {}
       options[:oulipo] = true if key == :oulipo
@@ -39,36 +44,73 @@ module PoemExe
       config = CONFIG[key]
       auth = YAML.safe_load(File.read(AUTH_FILE))['mastodon'][key.to_s]
 
-      @client = Mastodon::REST::Client.new(base_url: config[:server],
-                                           bearer_token: auth['access_token'])
+      @client = Mastodon::REST::Client.new(
+        base_url: config[:server],
+        bearer_token: auth['access_token']
+      )
       @poet = PoemExe::Poet.new(options)
     end
 
+    def generate(log: true, max_retries: 3)
+      last_error = nil
+      [ max_retries, 1 ].max.times do
+        $stderr.puts last_error if last_error
+        text = poet.generate
+        if text.nil? || text.empty?
+          last_error = "No poem generated"
+        elsif text.size > MAX_LENGTH
+          last_error = "Poem exceeded max length (#{text.size} chars)"
+        else
+          puts text if log
+          return text
+        end
+      end
+      raise PoemError, last_error if last_error
+    end
+
     def post
-      text = poet.generate
-      return if text.nil? || text.empty? || text.length > MAX_LENGTH
+      create_status(generate)
+    end
 
-      visibility = rand(PUBLIC_CHANCE) == 0 ? 'public' : 'unlisted'
+    def post_interactive
+      text = nil
+      action = :generate
 
-      puts text
-      puts "// visibility: #{visibility}"
+      while action do
+        text = generate(log: true) if action == :generate
+        puts "=> Post? (y)es, (n)o, (r)eroll"
 
-      create_status(text, visibility: visibility)
+        case gets.chomp
+        when "y" then
+          create_status(text)
+          action = nil
+        when "n", "q" then action = nil
+        when "r" then action = :generate
+        else action = :prompt
+        end
+      end
     end
 
     private
 
     attr_reader :poet, :client
 
-    def create_status(text, visibility:)
-      headers = { 'Idempotency-Key' => "#{Time.now} #{text.hash}" }
+    def create_status(text, visibility: "unlisted")
+      headers = {
+        'Idempotency-Key' => Digest::SHA256.hexdigest("#{Time.now} #{text}")
+      }
       3.times do |i|
-        sleep 5 if i > 0
+        sleep 2**i if i.positive?
         begin
-          return client.create_status(text, visibility: visibility,
-                                            headers: headers)
+          return client.create_status(text, visibility: visibility, headers: headers, quote_approval_policy: "public")
         rescue HTTP::TimeoutError
-          puts "HTTP timeout"
+          $stderr.puts 'HTTP timeout'
+        rescue FrozenError => e
+          # mastodon gem hasn't been updated in a few years.
+          # This error has been happening after successfully posting, so let it go...
+          $stderr.puts e
+          $stderr.puts "Assuming post was successful"
+          return
         end
       end
     end
@@ -77,17 +119,20 @@ end
 
 ARGV << '-h' if ARGV.empty?
 
-key = nil
+options = {}
 parser = OptionParser.new do |opts|
-  opts.banner = "Usage: bundle exec scripts/post-mastodon -k KEY"
+  opts.banner = 'Usage: bundle exec scripts/post-mastodon -k KEY'
   opts.on('-k=KEY') do |k|
-    key = k.to_sym
+    options[:key] = k.to_sym
+  end
+  opts.on('-i', '--[no-]interactive') do |i|
+    options[:interactive] = i
   end
 end
 parser.parse!
 
-if CONFIG.include? key
-  PoemExe::MastodonBot.new(key).post
-else
-  raise "Invalid key: #{key}"
-end
+key = options[:key]
+raise "Invalid key: #{key}" unless CONFIG.include?(key)
+
+bot = PoemExe::MastodonBot.new(key)
+options[:interactive] ? bot.post_interactive : bot.post

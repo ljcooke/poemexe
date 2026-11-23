@@ -44,7 +44,7 @@ def parse_credit(line):
 def convert_dirs(dirs, export=False):
     for dirname in dirs:
         for fn in glob(os.path.join(dirname, '*.txt')):
-            print('Reading {}'.format(fn))
+            sys.stdout.write('Reading {}'.format(fn))
             input_lines = None
             with codecs.open(fn, encoding='utf-8') as fp:
                 input_lines = fp.readlines()
@@ -74,7 +74,7 @@ def convert_dirs(dirs, export=False):
                     haiku = regex.sub(repl, haiku)
                 if haiku:
                     unique_haiku.add(haiku)
-            print('    %d unique haiku' % len(unique_haiku))
+            print(' : %d unique verses' % len(unique_haiku))
 
             # separate the lines into first, middle, and last buckets
             for haiku in unique_haiku:

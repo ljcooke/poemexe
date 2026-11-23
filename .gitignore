@@ -1,4 +1,4 @@
 *.log
 .bundle/*
 auth.*
-model.json
+model*.json

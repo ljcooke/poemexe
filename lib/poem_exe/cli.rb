@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'date'
+require 'optparse'
+
 module PoemExe
   # Command-line usage example:
   #
@@ -14,10 +17,11 @@ module PoemExe
       options: {},
     }.freeze
 
+    # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     def self.parse_args
       DEFAULT_CONFIG.dup.tap do |config|
         OptionParser.new do |opts|
-          opts.banner = "Usage: poem.rb [-n NUM]"
+          opts.banner = 'Usage: poem.rb [-n NUM]'
 
           opts.on('-m=MONTH', 'override the current month') do |m|
             month = m.to_i
@@ -42,6 +46,7 @@ module PoemExe
         end.parse!
       end
     end
+    # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
     def self.main
       config = parse_args

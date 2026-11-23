@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'verse_form'
+
 module PoemExe
   # ---------------------------------------------------------------------------
   # poem.exe generates poems using an approach based on Leonard Richardson's
@@ -19,34 +21,6 @@ module PoemExe
   #   6. Put them all together, giving a poem 2-4 lines long.
   # ---------------------------------------------------------------------------
 
-  class VerseForm
-    attr_reader :pattern
-
-    def initialize(*pattern, keep_pauses: false)
-      @pattern = pattern
-      @keep_pauses = keep_pauses
-    end
-
-    def size
-      pattern.size
-    end
-
-    def keep_pauses?
-      @keep_pauses
-    end
-  end
-
-  VERSE_FORMS = {
-    haiku:
-      VerseForm.new(:a, :b, :c, keep_pauses: true),
-    two_lines:
-      VerseForm.new(:a, :c),
-    four_lines:
-      VerseForm.new(:a, :b, :b, :c),
-    pairs:
-      VerseForm.new(:a, :c, :a, :c),
-  }
-
   class Queneau
     def initialize(verses)
       @verses = verses
@@ -54,8 +28,7 @@ module PoemExe
 
     def sample
       [].tap do |lines|
-        form_key = rand(5) > 0 ? :haiku : VERSE_FORMS.keys.sample
-        form = VERSE_FORMS[form_key]
+        form = VerseForm.pick
         verses = @verses.sample(form.size)
 
         form.pattern.each_with_index do |bucket, verse_index|
@@ -63,7 +36,7 @@ module PoemExe
           next if line.nil?
 
           line = line.gsub(/\u2014|\u2026/, ' ') unless form.keep_pauses?
-          lines << line
+          lines << line.split.join(' ')
         end
       end
     end
