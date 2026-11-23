@@ -9,12 +9,15 @@ poem_exe = PoemExe::Poet.new(options)
 
 (1..12).each do |month|
   1.times do
-    poem = poem_exe.generate(single_line: true, month: month, details: true)
-
-    text = poem[:text]
-    score = poem[:score]
     prefix = sprintf('%02d', month)
+    poem = poem_exe.generate(single_line: true, month:, details: true)
 
-    puts "#{prefix}  #{text} [#{score}]"
+    if poem
+      text = poem[:text]
+      score = poem[:score]
+      puts "#{prefix}  #{text} [#{score}]"
+    else
+      puts "#{prefix}  -"
+    end
   end
 end

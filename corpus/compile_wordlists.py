@@ -23,6 +23,8 @@ def compile_words(data_dir):
     vocab = {}
 
     for fn in glob(os.path.join(data_dir, '*.txt')):
+        if fn.endswith(".example.txt"):
+            continue
         name = os.path.splitext(os.path.basename(fn))[0]
         vocab[name] = tuple(read_wordlist(fn))
 

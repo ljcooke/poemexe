@@ -13,10 +13,11 @@ module PoemExe
     def initialize(path = DEFAULT_PATH)
       model = JSON.parse(File.read(path), symbolize_names: true)
       @queneau = PoemExe::Queneau.new(model[:verses])
-      @wordlists = model[:words]
+      @wordlists = model[:words] || {}
       @exclude_patterns = model[:excludes].map do |rule|
         Regexp.new(rule, Regexp::IGNORECASE)
       end
+      @tone_feature = has_words?(:tone_dark) && has_words?(:tone_bright)
     end
 
     def generate_lines
@@ -27,12 +28,18 @@ module PoemExe
       exclude_patterns.any? { |rule| rule.match(text) }
     end
 
+    def tone_feature?
+      @tone_feature
+    end
+
     def dark_tone?(text)
+      return false unless tone_feature?
       @dark_pattern ||= keyword_pattern(wordlists[:tone_dark])
       @dark_pattern.match?(text)
     end
 
     def bright_tone?(text)
+      return false unless tone_feature?
       @bright_pattern ||= keyword_pattern(wordlists[:tone_bright])
       @bright_pattern.match?(text)
     end
@@ -40,6 +47,11 @@ module PoemExe
     private
 
     attr_reader :exclude_patterns, :queneau
+
+    def has_words?(key)
+      wordlist = wordlists[key]
+      !wordlist.nil? && !wordlist.empty?
+    end
 
     def keyword_pattern(words)
       options = words.join('|')

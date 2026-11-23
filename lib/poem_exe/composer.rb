@@ -53,7 +53,11 @@ module PoemExe
     end
 
     def mood?(text)
-      model.dark_tone?(text) != model.bright_tone?(text)
+      if model.tone_feature?
+        model.dark_tone?(text) != model.bright_tone?(text)
+      else
+        true
+      end
     end
 
     def generate_lines
