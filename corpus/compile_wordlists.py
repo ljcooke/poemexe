@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 import codecs
-import json
 import os
 import sys
 from glob import glob
 
 
-OUTPUT_FILENAME = '../model/words.json'
+# OUTPUT_FILENAME = '../model/words.json'
 
 
 def read_wordlist(fn):
@@ -20,26 +19,28 @@ def read_wordlist(fn):
                 yield tuple(tokens)
 
 
-def compile_words(export=False):
+def compile_words(data_dir):
     vocab = {}
 
-    for fn in glob('wordlists/*.txt'):
+    for fn in glob(os.path.join(data_dir, '*.txt')):
         name = os.path.splitext(os.path.basename(fn))[0]
         vocab[name] = tuple(read_wordlist(fn))
 
-    if export:
-        with codecs.open(OUTPUT_FILENAME, 'w', encoding='utf-8') as vocabfile:
-            json.dump(vocab, vocabfile, indent=2, sort_keys=True, ensure_ascii=False)
+    # if export:
+    #     with codecs.open(OUTPUT_FILENAME, 'w', encoding='utf-8') as vocabfile:
+    #         json.dump(vocab, vocabfile, indent=2, sort_keys=True, ensure_ascii=False)
 
-        print('Wrote wordlists:')
-        for key, words in sorted(vocab.items()):
-            print('%7d %s' % (len(words), key))
+    #     print('Wrote wordlists:')
+    #     for key, words in sorted(vocab.items()):
+    #         print('%7d %s' % (len(words), key))
 
     return vocab
 
 
 def main():
-    compile_words(export=True)
+    raise NotImplemented
+
+    # compile_words(export=True)
 
 if __name__ == '__main__':
     sys.exit(main())

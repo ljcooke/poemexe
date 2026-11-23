@@ -1,4 +1,5 @@
 *.log
 .bundle/*
+.env*
 auth.*
 model*.json
