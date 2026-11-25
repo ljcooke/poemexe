@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'dry-struct'
+require 'forwardable'
 
 require_relative '../types'
 
@@ -9,12 +10,13 @@ module PoemExe
     class WordlistItem < Dry::Struct
       attribute :tokens, Types::StringArray
 
+      extend Forwardable
+      def_delegators :tokens, :to_json
+
       def self.parse(str)
         tokens = str.split('/')
         new(tokens:) unless tokens.empty?
       end
-
-      def to_json(*args) = tokens.to_json(*args)
     end
   end
 end

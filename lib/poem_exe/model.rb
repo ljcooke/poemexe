@@ -1,17 +1,25 @@
 # frozen_string_literal: true
 
 require 'json'
+require 'zlib'
+
 require_relative 'queneau'
 
 module PoemExe
-  DEFAULT_PATH = 'model.json'
+  DEFAULT_PATH = 'model.jsonz'
   WORD_ENDINGS = %w[ed er e?s est ful ing liness ly ness].freeze
 
   class Model
     attr_reader :wordlists
 
+    def self.read(path)
+      raw = File.open(path, 'rb').read
+      json = Zlib::Inflate.inflate(raw)
+      JSON.parse(json, symbolize_names: true)
+    end
+
     def initialize(path = DEFAULT_PATH)
-      model = JSON.parse(File.read(path), symbolize_names: true)
+      model = self.class.read(path)
       @queneau = PoemExe::Queneau.new(model[:verses])
       @wordlists = model[:words] || {}
       @exclude_patterns = model[:excludes].map do |rule|

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'forwardable'
 require 'json'
 
 require_relative '../types'
@@ -7,11 +8,12 @@ require_relative '../types'
 module PoemExe
   module Compiler
     class Builder
+      extend Forwardable
+      def_delegators :build, :to_json
+
       def initialize(log:)
         @log = log
       end
-
-      def to_json(*args) = build.to_json(*args)
 
       def build = raise NotImplementedError
 
