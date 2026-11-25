@@ -1,17 +1,17 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'date'
-require_relative '../lib/poem_exe'
+require "date"
+require_relative "../lib/poem_exe"
 
 options = {}
-options[:oulipo] = true if ARGV.include? '--oulipo'
+options[:oulipo] = true if ARGV.include? "--oulipo"
 
 poem_exe = PoemExe::Poet.new(options)
 
 (1..12).each do |month|
   1.times do
-    prefix = format('%02d', month)
+    prefix = format("%02d", month)
     poem = poem_exe.generate(single_line: true, month:, details: true)
 
     if poem

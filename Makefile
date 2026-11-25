@@ -1,12 +1,8 @@
-.PHONY: corpus test clean
+.PHONY: model test
 
-corpus:
-	(cd corpus && make)
+model:
+	bundle exec ruby bin/build-model
 	bundle exec scripts/test-model
 
 test:
 	bundle exec ruby lib/poem_exe.rb
-
-clean:
-	rm -f model/*
-	rmdir model

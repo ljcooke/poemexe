@@ -2,4 +2,4 @@
 .bundle/*
 .env*
 auth.*
-model*.json
+model*.*

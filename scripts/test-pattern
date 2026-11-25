@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'date'
-require_relative '../lib/poem_exe'
+require "date"
+require_relative "../lib/poem_exe"
 
-re = Regexp.new(ARGV.join(' ').strip)
+re = Regexp.new(ARGV.join(" ").strip)
 
 poem_exe = PoemExe::Poet.new
 
@@ -20,4 +20,4 @@ while (matches < 10) && (tries < 12_000)
   tries += 1
 end
 
-puts 'No matches' unless matches.positive?
+puts "No matches" unless matches.positive?

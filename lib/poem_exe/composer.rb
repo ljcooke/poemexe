@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'date'
+require "date"
 
-require_relative 'format'
-require_relative 'model'
-require_relative 'scoring'
+require_relative "format"
+require_relative "model"
+require_relative "scoring"
 
 module PoemExe
   class Poet
@@ -26,7 +26,7 @@ module PoemExe
     end
 
     def generate(options = {})
-      return if Date.today < Date.parse('2022-01-21')
+      return if Date.today < Date.parse("2022-01-21")
 
       options = options.dup
       options[:month] ||= Time.now.month
@@ -77,7 +77,7 @@ module PoemExe
         # For each multiple choice sequence in the form {foo,...}
         # replace it with one of the choices.
         line.strip.gsub(/\{.*?\}/) do |choices|
-          choices[1...-1].split(',').sample
+          choices[1...-1].split(",").sample
         end
       end
     end
@@ -101,7 +101,7 @@ module PoemExe
     end
 
     def substitute_vocab(text)
-      return text unless text.include?('%')
+      return text unless text.include?("%")
 
       # Match strings of the form %key.index%, e.g. %noun.1%
       pattern = /%(?<key>[^.%]+)(?:\.(?<index>[0-9]+))?%/
@@ -116,7 +116,7 @@ module PoemExe
         substitution
       end
 
-      updated.include?('%') ? nil : updated
+      updated.include?("%") ? nil : updated
     end
 
     def valid_text?(text)

@@ -5,11 +5,11 @@
 #   https://github.com/tootsuite/mastodon-api
 #   http://tinysubversions.com/notes/mastodon-bot/
 
-require 'digest'
-require 'mastodon'
-require 'optparse'
-require 'yaml'
-require_relative '../lib/poem_exe'
+require "digest"
+require "mastodon"
+require "optparse"
+require "yaml"
+require_relative "../lib/poem_exe"
 
 CONFIG = {
   # RIP
@@ -17,7 +17,7 @@ CONFIG = {
   #   server: 'https://botsin.space',
   # },
   oulipo: {
-    server: 'https://oulipo.social',
+    server: "https://oulipo.social",
   },
 }.freeze
 
@@ -28,7 +28,7 @@ CONFIG = {
 #     access_token: ...
 #   ...
 #
-AUTH_FILE = 'auth.yml'
+AUTH_FILE = "auth.yml"
 
 MAX_LENGTH = 500
 # PUBLIC_CHANCE = (0...100).freeze
@@ -42,11 +42,11 @@ module PoemExe
       options[:oulipo] = true if key == :oulipo
 
       config = CONFIG[key]
-      auth = YAML.safe_load(File.read(AUTH_FILE))['mastodon'][key.to_s]
+      auth = YAML.safe_load(File.read(AUTH_FILE))["mastodon"][key.to_s]
 
       @client = Mastodon::REST::Client.new(
         base_url: config[:server],
-        bearer_token: auth['access_token']
+        bearer_token: auth["access_token"]
       )
       @poet = PoemExe::Poet.new(options)
     end
@@ -57,7 +57,7 @@ module PoemExe
         warn last_error if last_error
         text = poet.generate
         if text.nil? || text.empty?
-          last_error = 'No poem generated'
+          last_error = "No poem generated"
         elsif text.size > MAX_LENGTH
           last_error = "Poem exceeded max length (#{text.size} chars)"
         else
@@ -78,14 +78,14 @@ module PoemExe
 
       while action
         text = generate(log: true) if action == :generate
-        puts '=> Post? (y)es, (n)o, (r)eroll'
+        puts "=> Post? (y)es, (n)o, (r)eroll"
 
         case gets.chomp
-        when 'y'
+        when "y"
           create_status(text)
           action = nil
-        when 'n', 'q' then action = nil
-        when 'r' then action = :generate
+        when "n", "q" then action = nil
+        when "r" then action = :generate
         else action = :prompt
         end
       end
@@ -95,21 +95,21 @@ module PoemExe
 
     attr_reader :poet, :client
 
-    def create_status(text, visibility: 'unlisted')
+    def create_status(text, visibility: "unlisted")
       headers = {
-        'Idempotency-Key' => Digest::SHA256.hexdigest("#{Time.now} #{text}"),
+        "Idempotency-Key" => Digest::SHA256.hexdigest("#{Time.now} #{text}"),
       }
       3.times do |i|
         sleep 2**i if i.positive?
         begin
-          return client.create_status(text, visibility: visibility, headers: headers, quote_approval_policy: 'public')
+          return client.create_status(text, visibility: visibility, headers: headers, quote_approval_policy: "public")
         rescue HTTP::TimeoutError
-          warn 'HTTP timeout'
+          warn "HTTP timeout"
         rescue FrozenError => e
           # mastodon gem hasn't been updated in a few years.
           # This error has been happening after successfully posting, so let it go...
           warn e
-          warn 'Assuming post was successful'
+          warn "Assuming post was successful"
           return nil
         end
       end
@@ -117,15 +117,15 @@ module PoemExe
   end
 end
 
-ARGV << '-h' if ARGV.empty?
+ARGV << "-h" if ARGV.empty?
 
 options = {}
 parser = OptionParser.new do |opts|
-  opts.banner = 'Usage: bundle exec scripts/post-mastodon -k KEY'
-  opts.on('-k=KEY') do |k|
+  opts.banner = "Usage: bundle exec scripts/post-mastodon -k KEY"
+  opts.on("-k=KEY") do |k|
     options[:key] = k.to_sym
   end
-  opts.on('-i', '--[no-]interactive') do |i|
+  opts.on("-i", "--[no-]interactive") do |i|
     options[:interactive] = i
   end
 end

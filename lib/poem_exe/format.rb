@@ -7,10 +7,10 @@ module PoemExe
     lines = repunctuate(text.strip.downcase).split("\n")
 
     # collapse whitespace
-    lines.map! { |line| line.split.join(' ') }
+    lines.map! { |line| line.split.join(" ") }
 
     # join the lines
-    sep = options[:single_line] ? ' / ' : "\n"
+    sep = options[:single_line] ? " / " : "\n"
     lines.join(sep)
   end
 
@@ -19,6 +19,6 @@ module PoemExe
   def self.repunctuate(text)
     text
       .gsub(/\.{2,}/, ELLIPSIS)
-      .gsub(/[.,:;\u2014]$/, '')
+      .gsub(/[.,:;\u2014]$/, "")
   end
 end
