@@ -1,0 +1,33 @@
+# frozen_string_literal: true
+
+require 'json'
+
+require_relative '../types'
+
+module PoemExe
+  module Compiler
+    class Builder
+      def initialize(log:)
+        @log = log
+      end
+
+      def to_json(*args) = build.to_json(*args)
+
+      def build = raise NotImplementedError
+
+      protected
+
+      def log_info(message)
+        puts "[#{self.class.name}] #{message}" if @log
+      end
+
+      def log_warn(message)
+        warn "[#{self.class.name}] #{message}" if @log
+      end
+
+      def rel_path(path)
+        path.relative_path_from(ENV['PWD'])
+      end
+    end
+  end
+end

@@ -10,7 +10,9 @@
 # MIT License
 # Copyright (c) 2014-2026 Liam Cooke
 #
+# https://poemexe.com/
 # https://github.com/ljcooke/poemexe
+# https://codeberg.org/ljc/poemexe
 # -----------------------------------------------------------------------------
 # Social media:
 #   https://oulipo.social/@quasihaiku

@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'json'
+
+require_relative '../lib/poem_exe/compiler/excludes_builder'
+
+old_excludes = JSON.parse(File.open('model.old.json').read).fetch('excludes')
+
+data_dir = Pathname.new(ENV.fetch('POEMEXE_DATA'))
+excludes = PoemExe::Compiler::ExcludesBuilder.new(path: data_dir.join('excludes.txt'))
+
+new_excludes = excludes.build
+
+puts 'Old:'
+puts old_excludes.to_json
+puts
+puts 'New:'
+puts new_excludes.to_json
+
+unless old_excludes == new_excludes
+  puts
+  puts 'Mismatch'
+end

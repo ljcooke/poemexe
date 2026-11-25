@@ -1,0 +1,35 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'json'
+
+require_relative '../lib/poem_exe/compiler/wordlists_builder'
+
+old_wordlists = JSON.parse(File.open('model.old.json').read).fetch('words')
+
+data_dir = Pathname.new(ENV.fetch('POEMEXE_DATA'))
+wordlists = PoemExe::Compiler::WordlistsBuilder.new(dir: data_dir.join('wordlists'))
+new_wordlists = wordlists.build
+
+puts 'Old:'
+puts old_wordlists.to_json
+puts
+puts 'New:'
+puts new_wordlists.to_json
+puts
+
+if old_wordlists.keys == new_wordlists.keys
+  new_wordlists.each do |key, new_wl|
+    old_wl = old_wordlists.fetch(key)
+    new_wl = new_wl.map(&:tokens)
+    puts "#{key} : #{old_wl.size} -> #{new_wl.size} : #{old_wl == new_wl ? :match : :changed}"
+    next unless old_wl != new_wl
+
+    old_wl.zip(new_wl).each do |old_item, new_item|
+      puts "  #{old_item.inspect} -> #{new_item.inspect}" unless old_item == new_item
+    end
+  end
+else
+  puts "Old keys: #{old_wordlists.keys.inspect}"
+  puts "New keys: #{new_wordlists.keys.inspect}"
+end

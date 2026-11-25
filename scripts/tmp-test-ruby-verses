@@ -1,0 +1,47 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'json'
+
+require_relative '../lib/poem_exe/compiler/verses_builder'
+
+old_json = JSON.parse(File.open('model.old.json').read).fetch('verses')
+
+data_dir = Pathname.new(ENV.fetch('POEMEXE_DATA'))
+
+def sort_value(obj, symbolized:)
+  [
+    obj.fetch(symbolized ? :source : 'source', 'ZZZZ'),
+    obj.fetch(symbolized ? :a : 'a'),
+    obj.fetch(symbolized ? :b : 'b'),
+    obj.fetch(symbolized ? :c : 'c'),
+  ].join('|')
+end
+
+def normalize(array, symbolized:)
+  array
+    .map { _1.is_a?(PoemExe::Compiler::Verse) ? _1.export : _1 }
+    .sort_by { sort_value(_1, symbolized:) }
+    .map(&:to_json)
+end
+
+builder = PoemExe::Compiler::VersesBuilder.new(dir: data_dir.join('sources'))
+old_verses = normalize(old_json, symbolized: false)
+new_verses = normalize(builder.build, symbolized: true)
+
+puts "Old: #{old_verses.size} (#{old_verses.uniq.size} unique)"
+puts old_verses[0..2]
+puts
+puts "New: #{new_verses.size} (#{new_verses.uniq.size} unique)"
+puts new_verses[0..2]
+puts
+
+extra_verses = new_verses.reject { old_verses.include?(_1) }
+if extra_verses.any?
+  puts "\nNew verses not found in the old set: #{extra_verses.size}"
+  puts '---'
+  extra_verses.each { puts _1 }
+  puts '---'
+else
+  puts 'OK'
+end

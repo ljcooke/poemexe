@@ -1,0 +1,22 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require_relative '../lib/poem_exe/compiler'
+
+DEFAULT_DIR = 'corpus'
+
+dir = Pathname.new(ENV.fetch('POEMEXE_DATA', DEFAULT_DIR))
+model = PoemExe::Compiler::ModelBuilder.new(dir:, log: true)
+
+begin
+  model.build
+rescue PoemExe::Compiler::InputError => e
+  warn "Error: #{e}"
+  exit 1
+end
+
+writer = PoemExe::Compiler::ModelWriter.new(model, log: true)
+
+%w[ model.json ].each do |path|
+  writer.write(Pathname.new(path))
+end
