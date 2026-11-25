@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require_relative '../types'
-require_relative 'input_error'
+require_relative "../types"
+require_relative "input_error"
 
 module PoemExe
   module Compiler
@@ -15,7 +15,7 @@ module PoemExe
         [ /\u201C|\u201D/, '"' ].freeze,
 
         # Remove double quotes
-        [ /"/, '' ].freeze,
+        [ /"/, "" ].freeze,
 
         # Em dash
         [ /--|\u2013|\B-|-\B|~/, "\u2014" ].freeze,
@@ -26,7 +26,7 @@ module PoemExe
         [ /\b \u2026/, "\u2026" ].freeze,
 
         # Duplicate spaces
-        [ / {2,}/, ' ' ].freeze,
+        [ / {2,}/, " " ].freeze,
       ].freeze
 
       attr_reader :credit, :verses
@@ -43,7 +43,7 @@ module PoemExe
       def parse
         reset!
         File.open(@path).readlines.each_with_index do |line, index|
-          parse_line(line, index) unless line.start_with?('#')
+          parse_line(line, index) unless line.start_with?("#")
         end
         complete_verse
         @verses.freeze
@@ -69,7 +69,7 @@ module PoemExe
       end
 
       def parse_first_line(line)
-        if line.start_with?('//')
+        if line.start_with?("//")
           @credit = line[2..].lstrip
         else
           parse_text_line(line, 0)
@@ -97,8 +97,8 @@ module PoemExe
       end
 
       def prepare_input_line(line, index)
-        line.split('#', 2).first.rstrip.tap do |line|
-          raise InputError.new("Verse on line #{index + 1} contains a URL") if RE_CONTAINS_URL.match?(line)
+        line.split("#", 2).first.rstrip.tap do |line|
+          raise InputError, "Verse on line #{index + 1} contains a URL" if RE_CONTAINS_URL.match?(line)
         end
       end
 

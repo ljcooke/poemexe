@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require_relative 'builder'
-require_relative 'input_path'
-require_relative 'verse'
-require_relative 'verses_parser'
+require_relative "builder"
+require_relative "input_path"
+require_relative "verse"
+require_relative "verses_parser"
 
 module PoemExe
   module Compiler
@@ -34,7 +34,7 @@ module PoemExe
 
       def input_paths
         @dir
-          .glob('**/*.txt')
+          .glob("**/*.txt")
           .sort
           .map { InputPath.new(_1) }
           .reject(&:example?)

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'forwardable'
-require 'json'
+require "forwardable"
+require "json"
 
-require_relative '../types'
+require_relative "../types"
 
 module PoemExe
   module Compiler

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require_relative 'builder'
-require_relative 'excludes_builder'
-require_relative 'verses_builder'
-require_relative 'wordlists_builder'
+require_relative "builder"
+require_relative "excludes_builder"
+require_relative "verses_builder"
+require_relative "wordlists_builder"
 
 module PoemExe
   module Compiler
@@ -18,21 +18,21 @@ module PoemExe
       end
 
       def excludes
-        @excludes ||= ExcludesBuilder.new(path: @dir.join('excludes.txt'), log: @log)
+        @excludes ||= ExcludesBuilder.new(path: @dir.join("excludes.txt"), log: @log)
       end
 
       def verses
-        @verses ||= VersesBuilder.new(dir: @dir.join('sources'), log: @log)
+        @verses ||= VersesBuilder.new(dir: @dir.join("sources"), log: @log)
       end
 
       def wordlists
-        @wordlists ||= WordlistsBuilder.new(dir: @dir.join('wordlists'), log: @log)
+        @wordlists ||= WordlistsBuilder.new(dir: @dir.join("wordlists"), log: @log)
       end
 
       private
 
       def build_model
-        log_info 'Building model'
+        log_info "Building model"
         {
           excludes: excludes.build,
           verses: verses.build,

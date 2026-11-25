@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'rules'
+require_relative "rules"
 
 module PoemExe
   def self.score(text, month:)

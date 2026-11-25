@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'verse_form'
+require_relative "verse_form"
 
 module PoemExe
   # ---------------------------------------------------------------------------
@@ -35,8 +35,8 @@ module PoemExe
           line = verses[verse_index][bucket].sample
           next if line.nil?
 
-          line = line.gsub(/\u2014|\u2026/, ' ') unless form.keep_pauses?
-          lines << line.split.join(' ')
+          line = line.gsub(/\u2014|\u2026/, " ") unless form.keep_pauses?
+          lines << line.split.join(" ")
         end
       end
     end

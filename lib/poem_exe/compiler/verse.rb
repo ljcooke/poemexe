@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'dry-struct'
-require 'forwardable'
+require "dry-struct"
+require "forwardable"
 
-require_relative '../types'
+require_relative "../types"
 
 module PoemExe
   module Compiler
@@ -31,7 +31,7 @@ module PoemExe
       end
 
       def sort_value
-        [ text, credit || '' ]
+        [ text, credit || "" ]
       end
     end
   end

@@ -1,11 +1,11 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require_relative '../lib/poem_exe/compiler'
+require_relative "../lib/poem_exe/compiler"
 
-DEFAULT_DIR = 'example'
+DEFAULT_DIR = "example"
 
-dir = Pathname.new(ENV.fetch('POEMEXE_DATA', DEFAULT_DIR))
+dir = Pathname.new(ENV.fetch("POEMEXE_DATA", DEFAULT_DIR))
 model = PoemExe::Compiler::ModelBuilder.new(dir:, log: true)
 
 begin
@@ -17,5 +17,5 @@ end
 
 writer = PoemExe::Compiler::ModelWriter.new(model, log: true)
 
-writer.write(Pathname.new('model.json'), pretty: true)
-writer.write(Pathname.new('model.jsonz'))
+writer.write(Pathname.new("model.json"), pretty: true)
+writer.write(Pathname.new("model.jsonz"))

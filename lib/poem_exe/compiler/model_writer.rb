@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'json'
-require 'zlib'
+require "json"
+require "zlib"
 
-require_relative '../types'
-require_relative 'model_builder'
+require_relative "../types"
+require_relative "model_builder"
 
 module PoemExe
   module Compiler
@@ -22,15 +22,15 @@ module PoemExe
 
         puts "[#{self.class.name}] Writing #{path}" if @log
         path.dirname.mkdir unless path.dirname.exist?
-        File.open(path, 'wb') { |fp| fp.write(data) }
+        File.open(path, "wb") { |fp| fp.write(data) }
       end
 
       private
 
       def export_format(format, pretty: false)
         case format
-        when 'json' then export_json(pretty:)
-        when 'jsonz' then export_jsonz
+        when "json" then export_json(pretty:)
+        when "jsonz" then export_jsonz
         else raise ArgumentError, "Unsupported format: #{format.inspect}"
         end
       end

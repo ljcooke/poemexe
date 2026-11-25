@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'dry-struct'
-require 'forwardable'
+require "dry-struct"
+require "forwardable"
 
-require_relative '../types'
+require_relative "../types"
 
 module PoemExe
   module Compiler
@@ -14,7 +14,7 @@ module PoemExe
       def_delegators :tokens, :to_json
 
       def self.parse(str)
-        tokens = str.split('/')
+        tokens = str.split("/")
         new(tokens:) unless tokens.empty?
       end
     end

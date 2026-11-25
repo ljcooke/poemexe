@@ -23,9 +23,9 @@
 module PoemExe
 end
 
-require_relative 'poem_exe/composer'
+require_relative "poem_exe/composer"
 
 if $PROGRAM_NAME == __FILE__
-  require_relative 'poem_exe/cli'
+  require_relative "poem_exe/cli"
   PoemExe::CLI.main
 end

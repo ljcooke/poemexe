@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../types'
+require_relative "../types"
 
 module PoemExe
   module Compiler
@@ -14,10 +14,10 @@ module PoemExe
 
       def initialize(path)
         @path = Types::Pathname[path]
-        @key = path.basename('.*').to_s
+        @key = path.basename(".*").to_s
       end
 
-      def example? = key.end_with?('.example')
+      def example? = key.end_with?(".example")
     end
   end
 end
