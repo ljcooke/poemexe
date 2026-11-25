@@ -3,7 +3,7 @@
 
 require_relative '../lib/poem_exe/compiler'
 
-DEFAULT_DIR = 'corpus'
+DEFAULT_DIR = 'example'
 
 dir = Pathname.new(ENV.fetch('POEMEXE_DATA', DEFAULT_DIR))
 model = PoemExe::Compiler::ModelBuilder.new(dir:, log: true)

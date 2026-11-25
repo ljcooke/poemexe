@@ -28,7 +28,7 @@ module PoemExe
       end
 
       def rel_path(path)
-        path.relative_path_from(ENV['PWD'])
+        path # TODO: Shortest path relative to PWD
       end
     end
   end
