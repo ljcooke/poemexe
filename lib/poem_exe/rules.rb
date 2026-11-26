@@ -109,7 +109,7 @@ module PoemExe
          spider|spine|spook|tomb|witch|wizard)
     /x),
     MonthRule.new([ 12 ], /
-      \b(bells|carol|festive|gift|jingl|joll|joy|merry|tree|twinkl)
+      \b(bells|carol|christmas|festive|gift|jingl|joll|joy|merry|tree|twinkl)
     /x),
   ].freeze
 end

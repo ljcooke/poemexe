@@ -100,23 +100,34 @@ module PoemExe
       text if valid_text?(text)
     end
 
-    def substitute_vocab(text)
+    def substitute_vocab(text) # rubocop:disable Metrics/AbcSize,Metrics/CyclomaticComplexity
       return text unless text.include?("%")
 
-      # Match strings of the form %key.index%, e.g. %noun.1%
-      pattern = /%(?<key>[^.%]+)(?:\.(?<index>[0-9]+))?%/
+      # Match strings of the form %<key>%, %<key>.<index>%, or %a.<key>%
+      pattern = /%(?<pre>an?\.)?(?<key>[^.%]+)(?:\.(?<index>[0-9]+))?%/
 
       updated = text.gsub(pattern) do
         match = Regexp.last_match
         key = match[:key].to_sym
         index = [ match[:index].to_i - 1, 0 ].max
-        substitution = model.wordlists[key].sample[index]
-        return nil unless substitution
 
-        substitution
+        entry = model.wordlists[key].sample
+        negate = entry.first.start_with?("!")
+        entry = entry[1..] if negate
+
+        sub = entry[index]
+        sub = indefinite(sub, negate:) if sub && match[:pre]&.start_with?("a")
+        return nil unless sub
+
+        sub
       end
 
       updated.include?("%") ? nil : updated
+    end
+
+    def indefinite(str, negate: false)
+      an = str.match?(/\A[aeiou]/) ^ negate
+      an ? "an #{str}" : "a #{str}"
     end
 
     def valid_text?(text)
