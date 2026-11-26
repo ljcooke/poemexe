@@ -36,7 +36,7 @@ module PoemExe
       end
 
       def read_wordlist(path)
-        log_info "Processing #{rel_path(path)}"
+        log_info "Processing #{path.basename}"
         File.open(path).readlines.map do |line|
           line = line.split("#", 2).first&.strip
           WordlistItem.parse(line) if line

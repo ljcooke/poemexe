@@ -15,7 +15,7 @@ class Tester
 
   def test_month(month)
     prefix = format("%02d", month)
-    3.times do |i|
+    2.times do |i|
       prefix = i.zero? ? "#{month.to_s.rjust(2)}." : ""
       poem = gen_poem(month:)
       print_poem(poem, prefix:)
@@ -23,10 +23,9 @@ class Tester
   end
 
   def print_poem(poem, prefix:)
-    prefix = prefix.ljust(4)
     text = poem ? poem.fetch(:text) : "-"
     extras = "[#{poem.fetch(:score)}]" if poem
-    puts "#{prefix}#{text} #{extras}".rstrip
+    puts "#{prefix.ljust(3)} #{text} #{extras}".rstrip
   end
 
   def gen_poem(month:)

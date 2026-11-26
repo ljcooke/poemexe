@@ -19,7 +19,7 @@ module PoemExe
       private
 
       def read_excludes
-        log_info "Processing #{rel_path(@path)}"
+        log_info "Processing #{@path.basename}"
         File.open(@path).readlines.map do |line|
           line = line.split("#", 2).first&.strip
           line unless line.nil? || line.empty?

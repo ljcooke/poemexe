@@ -41,7 +41,7 @@ module PoemExe
       end
 
       def verses_in_file(path)
-        log_info "Processing #{rel_path(path)}"
+        log_info "Processing #{path.basename}"
         VersesParser.parse(path:)
       end
 

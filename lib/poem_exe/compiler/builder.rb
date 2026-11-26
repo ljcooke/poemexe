@@ -26,10 +26,6 @@ module PoemExe
       def log_warn(message)
         warn "[#{self.class.name}] #{message}" if @log
       end
-
-      def rel_path(path)
-        path # TODO: Shortest path relative to PWD
-      end
     end
   end
 end
